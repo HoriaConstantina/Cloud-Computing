@@ -65,8 +65,51 @@
 
 - Now you need to exit from your VM 
 - do the following:
-	- scp -i ~/.ssh/devop_bootcamp.pem /home/user/app user@vmLink.com:/home/ubuntu/
+	- scp -i ~/.ssh/devop_bootcamp.pem -r /home/user/app user@vmLink.com:/home/ubuntu/
 - now log back in
 - go inside /home/ubuntu/app
 - run node app.js
 - access yourIP:3000 in the browser 
+
+
+### Creating the DB EC2 Instance
+
+- choose EC2 inside AWS
+- search for Ubuntu Server 16.04 LTS (HVM), SSD Volume Type and select it (must>
+- select the t2.micro under the Type column
+- click Next: Configure Instance Details
+- Network: leave it as default
+- Subnet: select the DevOpsStudents subnet
+- Auto-assign Public IP: Enable
+- click Next: Add Storage
+- Choose how much storage you need and the Volume Type
+- click Next: Add Tags
+- Add whatever tags you'd like
+- click Next: Configure Security Group
+- Choose Create a new security group
+- for SSH under the Source column select My IP
+- Add a new rule of type Custom TCP and under the Source column set it to your app instance IP (your.app.instance.ip/32)
+- click Review and Launch
+- select the devop_bootcamp.pem file and you are ready to Launch
+
+## After the DB Instance was created
+- scp -i ~/.ssh/devop_bootcamp.pem -r /home/user/app user@vmLink.com:/home/ubuntu/
+- Now ssh into your VM using the ssh command provided in AWS: ssh -i "devop_bootcamp.pem user@awsVirtualMachineLink.com
+- Once you are inside your db instance do the following:
+	- cd mongoDB/db/
+	- sudo ./provision.sh (in case it is not working do: chmod +x provision.sh)
+
+## After you have both instances up and running
+- ssh into your app instance
+- cd ~
+- sudo nano .bashrc
+- at the end of the file type: export DB_HOST://your.db.instance.ip:27017/posts", save and exit
+- source .bashrc
+- sudo nano /etc/profile
+- at the end of the file type: DB_HOST://your.db.instance.ip:27017/posts", save and exit
+- cd /home/ubuntu/app/seeds
+- node seed.js
+- wait until you see "Database Seeded, Databases Cleared"
+- cd /home/ubuntu/app
+- npm start or node app.js
+- access your app ip in your browser
